@@ -6,6 +6,9 @@ import urllib.parse
 # 你的 Bark Key
 BARK_KEY = os.environ.get('BARK_KEY', 'yZbC8oP6nFcQgLzgTL4eqU')
 
+# 图标 URL（蝴蝶结 🎀）
+ICON_URL = "https://day.app/assets/images/bark.jpg"
+
 # 晚安情话库（50条！）
 goodnight_msgs = [
     "宝宝晚安，梦里见😈",
@@ -118,7 +121,8 @@ def send_message(msg_list):
     msg = random.choice(msg_list)
     # URL编码中文
     encoded_msg = urllib.parse.quote(msg)
-    url = f"https://api.day.app/{BARK_KEY}/{encoded_msg}"
+    # 关键修改：加上 icon 参数 🎀
+    url = f"https://api.day.app/{BARK_KEY}/{encoded_msg}?icon={ICON_URL}"
     try:
         response = requests.get(url, timeout=10)
         print(f"发送成功: {msg}")
