@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '0 16 * * *'    # 每天16:00 UTC = 北京时间00:00（晚安）
     - cron: '0 1 * * *'     # 每天01:00 UTC = 北京时间09:00（早安）
+    - cron: '0 2-14 * * *'  # 每小时检查，脚本控制每天随机触发一次（骚扰模式）
   workflow_dispatch:  # 手动触发
 
 jobs:
@@ -30,7 +31,6 @@ jobs:
   send-night:
     runs-on: ubuntu-latest
     if: github.event.schedule == '0 16 * * *' || github.event_name == 'workflow_dispatch'
-    # ↑ 关键修复：'0 0' → '0 16'，加上 workflow_dispatch 支持手动测试
     steps:
       - uses: actions/checkout@v3
       
@@ -47,3 +47,22 @@ jobs:
           BARK_KEY: ${{ secrets.BARK_KEY }}
           MSG_TYPE: night
         run: python script.py
+
+  random-attack:  # 新增：随机骚扰任务
+    runs-on: ubuntu-latest
+    if: github.event.schedule != '0 16 * * *' && github.event.schedule != '0 1 * * *'
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: pip install requests
+        
+      - name: Random attack
+        env:
+          BARK_KEY: ${{ secrets.BARK_KEY }}
+        run: python random_attack.py
